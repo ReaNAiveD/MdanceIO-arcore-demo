@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Mdance IO AR</string>
+    <string name="need_google_service_exception">Please install Google Play Services for AR</string>
+    <string name="need_update_arcore">Please update ARCore</string>
+    <string name="need_update_app">Please update this app</string>
+    <string name="device_not_support">This device does not support AR</string>
+    <string name="camera_not_available">Camera not available. Try restarting the app.</string>
+    <string name="create_ar_session_common_failure">Failed to create AR session</string>
+    <string name="request_permission_rationale">The camera is important for this app. Please grant the permission.</string>
+    <string name="request_permission_denied">Camera permission required for this app to be available. Please grant the permission.</string>
+    <string name="request_permission">Request permission</string>
+</resources>

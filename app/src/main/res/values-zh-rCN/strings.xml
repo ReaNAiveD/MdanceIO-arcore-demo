@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mdance IO AR</string>
+    <string name="need_google_service_exception">请安装Google Play Services for AR</string>
+    <string name="need_update_arcore">请更新ARCore</string>
+    <string name="need_update_app">请更新应用</string>
+    <string name="device_not_support">此设备不支持AR</string>
+    <string name="camera_not_available">相机不可用，请重启app。</string>
+    <string name="create_ar_session_common_failure">创建AR会话失败</string>
+    <string name="request_permission_rationale">此应用依赖相机运行，烦请授权。</string>
+    <string name="request_permission_denied">您已拒绝授权相机权限，相机权限对于本应用运行非常重要，请您手动授权。</string>
+    <string name="request_permission">授权</string>
+</resources>
