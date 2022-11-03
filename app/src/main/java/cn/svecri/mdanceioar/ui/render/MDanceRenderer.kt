@@ -13,7 +13,6 @@ import cn.svecri.mdanceioar.ui.render.GLError.maybeThrowGLException
 import com.google.ar.core.*
 import com.google.ar.core.Point.OrientationMode
 import com.google.ar.core.exceptions.CameraNotAvailableException
-import com.google.ar.core.exceptions.NotYetAvailableException
 import java.io.File
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
@@ -106,13 +105,13 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val display = windowManager.defaultDisplay
 //        val display = context.display
-        val displayRotation = display.rotation;
-        session?.setDisplayGeometry(displayRotation, viewportWidth, viewportHeight);
+        val displayRotation = display.rotation
+        session?.setDisplayGeometry(displayRotation, viewportWidth, viewportHeight)
         Log.d(TAG, "onSurfaceChanged: $w, $h")
     }
 
     override fun onDrawFrame(gl: GL10) {
-        clear(.5f, 0.5f, 0.5f, 1f)
+        clear(0f, 0f, 0f, 1f)
 
         val session = session ?: return
         if (!hasSetTextureNames) {

@@ -67,7 +67,7 @@ class BackgroundRenderer(private val assets: AssetManager): GLSurfaceView.Render
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES32.glGenTextures(1, cameraColorTextureId, 0)
-        maybeThrowGLException("Texture creation failed", "glGenTextures");
+        maybeThrowGLException("Texture creation failed", "glGenTextures")
         try {
             GLES32.glBindTexture(cameraColorTarget, cameraColorTextureId[0])
             maybeThrowGLException("Failed to bind texture", "glBindTexture")
