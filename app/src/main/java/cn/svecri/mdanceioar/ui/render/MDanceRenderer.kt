@@ -74,8 +74,6 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
     private val session
         get() = sessionContainer.session
 
-    private var tmp = 0
-
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
         GLES30.glEnable(GLES30.GL_BLEND)
         maybeThrowGLException("Failed to enable blending", "glEnable")
@@ -114,9 +112,6 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
     }
 
     override fun onDrawFrame(gl: GL10) {
-//        if (tmp == 32) {
-//            return
-//        }
         clear(.5f, 0.5f, 0.5f, 1f)
 
         val session = session ?: return
@@ -147,14 +142,7 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
         camera.getViewMatrix(viewMatrix, 0)
         modelAnchor?.pose?.extractTranslation()?.toMatrix(modelMatrix, 0)
 
-        if (tmp > 30) {
-            for (i in 0..10) {
-                Log.i(TAG, "Texture $i Exist: ${GLES30.glIsTexture(i)}")
-            }
-            proxy.redrawFrom(modelMatrix.toList(), viewMatrix.toList(), projectionMatrix.toList())
-        }
-        tmp++
-//        proxy.redraw()
+        proxy.redrawFrom(modelMatrix.toList(), viewMatrix.toList(), projectionMatrix.toList())
     }
 
     private fun clear(r: Float, g: Float, b: Float, a: Float) {

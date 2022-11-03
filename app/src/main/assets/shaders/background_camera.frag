@@ -4,6 +4,7 @@
 precision mediump float;
 
 uniform samplerExternalOES u_CameraColorTexture;
+//uniform sampler2D u_CameraColorTexture;
 in vec2 v_CameraTexCoord;
 
 layout(location = 0) out vec4 o_FragColor;
