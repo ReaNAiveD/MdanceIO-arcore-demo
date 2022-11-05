@@ -3,6 +3,7 @@ package cn.svecri.mdanceioar.ui.render
 import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
+import android.opengl.Matrix
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -55,6 +56,8 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
     private val modelMatrix = floatArrayOf(1f, 0f, 0f, 0f, /**/0f, 1f, 0f, 0f, /**/0f, 0f, 1f, 0f, /**/0f, 0f, 0f, 1f)
     private val viewMatrix = FloatArray(16)
     private val projectionMatrix = FloatArray(16)
+
+    private val reverseYMatrix = floatArrayOf(1f, 0f, 0f, 0f, /**/0f, -1f, 0f, 0f, /**/0f, 0f, 1f, 0f, /**/0f, 0f, 0f, 1f)
 
     private var hasSetTextureNames = false
 
@@ -137,7 +140,9 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
             backgroundRenderer.onDrawFrame(gl)
         }
 
-        camera.getProjectionMatrix(projectionMatrix, 0, Z_NEAR, Z_FAR)
+        val tmpMatrix = FloatArray(16)
+        camera.getProjectionMatrix(tmpMatrix, 0, Z_NEAR, Z_FAR)
+        Matrix.multiplyMM(projectionMatrix, 0, reverseYMatrix, 0, tmpMatrix, 0)
         camera.getViewMatrix(viewMatrix, 0)
         modelAnchor?.pose?.extractTranslation()?.toMatrix(modelMatrix, 0)
 
