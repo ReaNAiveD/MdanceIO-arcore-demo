@@ -38,6 +38,21 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
             }
         }
 
+        @OptIn(ExperimentalUnsignedTypes::class)
+        private fun mapFiles(context: Context, dirPath: String, onFile: (String, List<UByte>) -> Unit, prefix: String="") {
+            val filesDir = context.filesDir
+            val dir = File(filesDir, dirPath)
+            if (!dir.exists() || dir.isFile) return
+            for (file in dir.listFiles()!!) {
+                val nPrefix = if (prefix.isEmpty()) {file.name} else {"$prefix/${file.name}"}
+                if (file.isFile) {
+                    onFile(nPrefix, file.readBytes().asUByteArray().asList())
+                } else {
+                    mapFiles(context, "$dirPath/${file.name}", onFile, nPrefix)
+                }
+            }
+        }
+
         fun calculateDistanceToPlane(planePose: Pose, cameraPose: Pose): Float {
             val normal = FloatArray(3)
             val cameraX = cameraPose.tx()
@@ -53,11 +68,14 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
     private lateinit var proxy: AndroidProxy
 
     private var modelAnchor: Anchor? = null
+    private val modelInitPose = Pose(floatArrayOf(0f, -1.5f, -2f), floatArrayOf(0f, 0f, 0f, 1f))
     private val modelMatrix = floatArrayOf(1f, 0f, 0f, 0f, /**/0f, 1f, 0f, 0f, /**/0f, 0f, 1f, 0f, /**/0f, 0f, 0f, 1f)
     private val viewMatrix = FloatArray(16)
     private val projectionMatrix = FloatArray(16)
 
+    private val scaleMatrix = floatArrayOf(.1f, 0f, 0f, 0f, /**/0f, .1f, 0f, 0f, /**/0f, 0f, .1f, 0f, /**/0f, 0f, 0f, 1f)
     private val reverseYMatrix = floatArrayOf(1f, 0f, 0f, 0f, /**/0f, -1f, 0f, 0f, /**/0f, 0f, 1f, 0f, /**/0f, 0f, 0f, 1f)
+    private val rotationYMatrix = floatArrayOf(-1f, 0f, 0f, 0f, /**/0f, 1f, 0f, 0f, /**/0f, 0f, -1f, 0f, /**/0f, 0f, 0f, 1f)
 
     private var hasSetTextureNames = false
 
@@ -91,6 +109,10 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
             Log.e(TAG, "onSurfaceCreated: Fail to load model")
             return
         }
+        mapFiles(context, "model/砂糖", { name, bytes ->
+            proxy.loadTexture(name, bytes, false)
+        })
+        proxy.updateBindTexture()
         val motion = readFile(context, "motion/神里绫华_传说任务.vmd")
         if (motion != null) {
             proxy.loadModelMotion(motion)
@@ -144,7 +166,13 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
         camera.getProjectionMatrix(tmpMatrix, 0, Z_NEAR, Z_FAR)
         Matrix.multiplyMM(projectionMatrix, 0, reverseYMatrix, 0, tmpMatrix, 0)
         camera.getViewMatrix(viewMatrix, 0)
-        modelAnchor?.pose?.extractTranslation()?.toMatrix(modelMatrix, 0)
+        tryInitModelAnchor(session, camera)
+        modelAnchor?.pose?.let {
+            it.toMatrix(tmpMatrix, 0)
+//            Log.i(TAG, "Anchor Pos (${it.tx()}, ${it.ty()}, ${it.tz()})")
+            Matrix.multiplyMM(tmpMatrix, 0, tmpMatrix, 0, scaleMatrix, 0)
+            Matrix.multiplyMM(modelMatrix, 0, tmpMatrix, 0, rotationYMatrix, 0)
+        }
 
         proxy.redrawFrom(modelMatrix.toList(), viewMatrix.toList(), projectionMatrix.toList())
     }
@@ -182,6 +210,13 @@ class MDanceRenderer(private val sessionContainer: ARCoreSessionContainer, priva
         if (firstHitResult != null) {
             modelAnchor?.detach()
             modelAnchor = firstHitResult.createAnchor()
+        }
+    }
+
+    private fun tryInitModelAnchor(session: Session, camera: Camera) {
+        if (camera.trackingState != TrackingState.TRACKING) return
+        if (modelAnchor == null) {
+            modelAnchor = session.createAnchor(modelInitPose)
         }
     }
 }
